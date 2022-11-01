@@ -1,6 +1,5 @@
 package com.papaco.papacoauthservice.auth.oauth;
 
-import com.papaco.papacoauthservice.auth.jwt.JwtFilter;
 import com.papaco.papacoauthservice.auth.jwt.TokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
@@ -19,6 +18,7 @@ public class CustomAuthenticationSuccessHandler extends SimpleUrlAuthenticationS
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
         String jwt = tokenProvider.createToken(authentication);
 
-        response.setHeader(JwtFilter.AUTHORIZATION_HEADER, "Bearer " + jwt);
+        response.setStatus(HttpServletResponse.SC_OK);
+        response.setHeader(tokenProvider.AUTHORIZATION_HEADER, "Bearer " + jwt);
     }
 }

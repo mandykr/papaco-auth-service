@@ -2,8 +2,7 @@ package com.papaco.papacoauthservice.auth;
 
 import com.papaco.papacoauthservice.auth.jwt.JwtAccessDeniedHandler;
 import com.papaco.papacoauthservice.auth.jwt.JwtAuthenticationEntryPoint;
-import com.papaco.papacoauthservice.auth.jwt.JwtSecurityConfig;
-import com.papaco.papacoauthservice.auth.jwt.TokenProvider;
+import com.papaco.papacoauthservice.auth.oauth.CustomAuthenticationFailureHandler;
 import com.papaco.papacoauthservice.auth.oauth.CustomAuthenticationSuccessHandler;
 import com.papaco.papacoauthservice.auth.oauth.CustomOAuth2UserService;
 import lombok.RequiredArgsConstructor;
@@ -21,11 +20,10 @@ import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 @Configuration
 public class SecurityConfig {
     private final CustomOAuth2UserService customOAuth2UserService;
-    private final TokenProvider tokenProvider;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
     private final CustomAuthenticationSuccessHandler authenticationSuccessHandler;
-//    private final CustomAuthenticationFailureHandler authenticationFailureHandler;
+    private final CustomAuthenticationFailureHandler authenticationFailureHandler;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -61,16 +59,12 @@ public class SecurityConfig {
 
                 .and()
                 .successHandler(authenticationSuccessHandler)
-//                .failureHandler(authenticationFailureHandler)
+                .failureHandler(authenticationFailureHandler)
                 .permitAll()
 
                 .and()
                 .exceptionHandling()
-                .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
-
-                .and()
-                .apply(new JwtSecurityConfig(tokenProvider));
-
+                .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED));
 
         http.logout()
                 .deleteCookies("JSESSIONID")
