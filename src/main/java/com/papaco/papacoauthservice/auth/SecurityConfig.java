@@ -8,6 +8,7 @@ import com.papaco.papacoauthservice.auth.oauth.CustomOAuth2UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -19,6 +20,7 @@ import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 @EnableWebSecurity
 @Configuration
 public class SecurityConfig {
+    private final Environment env;
     private final CustomOAuth2UserService customOAuth2UserService;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
@@ -32,20 +34,18 @@ public class SecurityConfig {
                 .formLogin().disable()
                 .httpBasic().disable()
 
-                // enable h2-console
                 .headers()
                 .frameOptions()
                 .sameOrigin()
 
-                // 세션을 사용하지 않기 때문에 STATELESS로 설정
                 .and()
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 
                 .and()
                 .authorizeRequests()
-                .antMatchers("/", "/login/**").permitAll()
-                .anyRequest().authenticated()
+                .antMatchers("/oauth2/**", "/login/**").permitAll()
+                .antMatchers("/**").hasIpAddress(env.getProperty("gateway.ip"))
 
                 .and()
                 .exceptionHandling()
