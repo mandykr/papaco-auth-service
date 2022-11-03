@@ -8,7 +8,7 @@ import lombok.ToString;
 @AllArgsConstructor
 public class AccountUpdatedEvent implements AccountEvent {
     private EventType eventType;
-    private Long id;
+    private Long aggregateId;
     private String name;
     private String email;
 
@@ -27,8 +27,8 @@ public class AccountUpdatedEvent implements AccountEvent {
     }
 
     @Override
-    public Long getId() {
-        return id;
+    public Long getAggregateId() {
+        return aggregateId;
     }
 
     public String getName() {

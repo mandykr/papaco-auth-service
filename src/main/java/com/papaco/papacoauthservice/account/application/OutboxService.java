@@ -23,7 +23,7 @@ public class OutboxService {
     public void saveOutbox(AccountEvent accountEvent) {
         try {
             String payload = objectMapper.writeValueAsString(accountEvent);
-            Outbox outbox = new Outbox(accountEvent.getId(), accountEvent.getClass().getSimpleName(), accountEvent.getEventType(), payload);
+            Outbox outbox = new Outbox(accountEvent.getAggregateId(), accountEvent.getClass().getSimpleName(), accountEvent.getEventType(), payload);
             outboxRepository.save(outbox);
         } catch (JsonProcessingException | IllegalArgumentException e) {
             log.error("accountEvent={}", accountEvent, e);
