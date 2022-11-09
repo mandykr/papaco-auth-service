@@ -1,7 +1,8 @@
 package com.papaco.papacoauthservice.account.application.message;
 
+import com.papaco.papacoauthservice.account.domain.AccountOutbox;
 import com.papaco.papacoauthservice.account.domain.Outbox;
-import com.papaco.papacoauthservice.account.domain.repository.OutboxRepository;
+import com.papaco.papacoauthservice.account.domain.repository.AccountOutboxRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
@@ -15,7 +16,7 @@ import java.util.List;
 @Transactional
 @Service
 public class MessageRelayService {
-    private final OutboxRepository outboxRepository;
+    private final AccountOutboxRepository accountOutboxRepository;
     private final AccountProducer accountProducer;
 
     @Value("${cdc.batch_size}")
@@ -23,8 +24,10 @@ public class MessageRelayService {
 
     @Scheduled(fixedDelayString = "${cdc.polling_ms}")
     public void sendAccountEvent() {
-        List<Outbox> outboxes = outboxRepository.findAllByOrderByIdAsc(Pageable.ofSize(batchSize)).toList();
+        List<AccountOutbox> outboxes = accountOutboxRepository.
+                findAllByPublishedIsFalseOrderByIdAsc(Pageable.ofSize(batchSize))
+                .toList();
         accountProducer.send(outboxes);
-        outboxRepository.deleteAllInBatch(outboxes);
+        outboxes.forEach(Outbox::publish);
     }
 }

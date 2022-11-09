@@ -1,12 +1,13 @@
 package com.papaco.papacoauthservice.account.domain;
 
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 public class Account {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)

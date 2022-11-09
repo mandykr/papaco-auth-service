@@ -1,37 +1,27 @@
 package com.papaco.papacoauthservice.account.domain;
 
-import com.papaco.papacoauthservice.account.domain.event.EventType;
-import lombok.AccessLevel;
+import com.papaco.papacoauthservice.account.domain.event.DomainEvent;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import javax.persistence.*;
+import javax.persistence.EntityListeners;
+import javax.persistence.MappedSuperclass;
+import java.time.LocalDateTime;
 
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Entity
-public class Outbox {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+@MappedSuperclass
+@EntityListeners(AuditingEntityListener.class)
+public abstract class Outbox {
+    @CreatedDate
+    LocalDateTime createdAt;
+    boolean published;
+    LocalDateTime publishedAt;
 
-    @Column(nullable = false)
-    private Long aggregateId;
-
-    @Column(nullable = false)
-    private String aggregateType;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private EventType eventType;
-
-    @Lob
-    @Column(nullable = false)
-    private String payload;
-
-    public Outbox(Long aggregateId, String aggregateType, EventType eventType, String payload) {
-        this.aggregateId = aggregateId;
-        this.aggregateType = aggregateType;
-        this.eventType = eventType;
-        this.payload = payload;
+    public void publish() {
+        this.published = true;
+        this.publishedAt = LocalDateTime.now();
     }
+
+    public abstract Outbox create(DomainEvent event, String payload);
 }

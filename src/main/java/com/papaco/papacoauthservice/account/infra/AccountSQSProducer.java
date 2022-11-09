@@ -1,7 +1,7 @@
 package com.papaco.papacoauthservice.account.infra;
 
 import com.papaco.papacoauthservice.account.application.message.AccountProducer;
-import com.papaco.papacoauthservice.account.domain.Outbox;
+import com.papaco.papacoauthservice.account.domain.AccountOutbox;
 import io.awspring.cloud.messaging.core.QueueMessagingTemplate;
 import io.awspring.cloud.messaging.core.SqsMessageHeaders;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +25,7 @@ public class AccountSQSProducer implements AccountProducer {
 
     @Transactional
     @Override
-    public void send(List<Outbox> outboxes) {
+    public void send(List<AccountOutbox> outboxes) {
         outboxes.forEach(outbox -> {
             Message<String> message = MessageBuilder.withPayload(outbox.getPayload())
                     .setHeader(SqsMessageHeaders.SQS_GROUP_ID_HEADER, String.valueOf(outbox.getAggregateId()))
